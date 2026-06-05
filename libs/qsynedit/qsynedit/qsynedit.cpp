@@ -2931,11 +2931,9 @@ void QSynEdit::endMergeCaretAndSelectionStatusChange()
 
 PSyntaxState QSynEdit::calcSyntaxStateAtLine(int line, const QString &newLineText, bool handleLastBackSlash) const
 {
-    bool oldHandleLastBackSlash = true;
     PSyntaxer syntaxer = mSyntaxer->createInstance();
     if (syntaxer->language() == ProgrammingLanguage::CPP) {
         std::shared_ptr<QSynedit::CppSyntaxer> cppSyntaxer = std::dynamic_pointer_cast<QSynedit::CppSyntaxer>(syntaxer);
-        oldHandleLastBackSlash = cppSyntaxer->handleLastBackSlash();
         cppSyntaxer->setHandleLastBackSlash(handleLastBackSlash);
     }
     startParseLine(syntaxer.get(), line, newLineText);
@@ -5666,7 +5664,7 @@ void QSynEdit::doInsertText(const CharPos& pos,
 
 }
 
-void QSynEdit::doInsertTextByNormalMode(const CharPos& pos, const QStringList& text)
+void QSynEdit::doInsertTextByNormalMode(CharPos pos, const QStringList& text)
 {
     Q_ASSERT(validInDoc(pos));
     QString sLeftSide;
@@ -5685,7 +5683,20 @@ void QSynEdit::doInsertTextByNormalMode(const CharPos& pos, const QStringList& t
             QString s = text[0];
             if (sLeftSide.trimmed().isEmpty() && shouldRecalcIndent(currentLine)) {
                 s=s.trimmed();
+                addChangeToUndo(ChangeReason::Delete,
+                                {0,pos.line},
+                                {pos.ch,pos.line},
+                                QStringList({sLeftSide}),
+                                SelectionMode::Normal
+                                );
                 sLeftSide = genSpaces(calcIndentSpaces(currentLine,s,true));
+                pos.ch = sLeftSide.length();
+                addChangeToUndo(ChangeReason::Insert,
+                                {0,pos.line},
+                                {pos.ch,pos.line},
+                                QStringList({}),
+                                SelectionMode::Normal
+                                );
             }
             str = sLeftSide + s;
         } else
@@ -5722,7 +5733,20 @@ void QSynEdit::doInsertTextByNormalMode(const CharPos& pos, const QStringList& t
             QString s = text[0];
             if (sLeftSide.trimmed().isEmpty() && shouldRecalcIndent(currentLine)) {
                 s=s.trimmed();
+                addChangeToUndo(ChangeReason::Delete,
+                                {0,pos.line},
+                                {pos.ch,pos.line},
+                                QStringList({sLeftSide}),
+                                SelectionMode::Normal
+                                );
                 sLeftSide = genSpaces(calcIndentSpaces(currentLine,s,true));
+                pos.ch = sLeftSide.length();
+                addChangeToUndo(ChangeReason::Insert,
+                                {0,pos.line},
+                                {pos.ch,pos.line},
+                                QStringList({}),
+                                SelectionMode::Normal
+                                );
             }
             str = sLeftSide + s + sRightSide;
         } else
