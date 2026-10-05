@@ -16,6 +16,7 @@
  */
 #include "main.h"
 #include "utils/os.h"
+#include <QIcon>
 
 #ifdef Q_OS_WIN
 static_assert(WM_APP_OPEN_FILE < 0xc000);
@@ -263,6 +264,7 @@ int main(int argc, char *argv[])
 #if QT_VERSION_MAJOR < 6
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
+    app.setWindowIcon(QIcon(":/icons/images/devcpp.ico"));
     QDir startupDir = QDir::current();
     ExternalResource resource;
 
@@ -357,7 +359,7 @@ int main(int argc, char *argv[])
         //load settings
         pSettings = settings.get();
         if (firstRun) {
-            pSettings->compilerSets().findSets();
+            pSettings->compilerSets().findSets(true);
             pSettings->compilerSets().saveSets();
         }
         pSettings->load();
@@ -381,6 +383,12 @@ int main(int argc, char *argv[])
             }
 
             pSettings->editor().setDefaultFileCpp(themeDialog.language()==ChooseThemeDialog::Language::CPlusPlus);
+            if (themeDialog.shareParser()) {
+                pSettings->codeCompletion().setShareParser(true);
+                pSettings->codeCompletion().setClearWhenEditorHidden(true);
+            } else {
+                pSettings->codeCompletion().setShareParser(false);
+            }
             pSettings->editor().save();
 
             //auto detect git in path

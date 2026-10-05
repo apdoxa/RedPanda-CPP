@@ -117,7 +117,7 @@
      <x>0</x>
      <y>0</y>
      <width>2054</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -261,6 +261,7 @@
     <addaction name="separator"/>
     <addaction name="actionTrim_trailing_spaces"/>
     <addaction name="actionReformat_Code"/>
+    <addaction name="actionReparse_Code"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
@@ -510,7 +511,7 @@
      <enum>QTabWidget::North</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="usesScrollButtons">
      <bool>true</bool>
@@ -672,7 +673,7 @@
       <item>
        <widget class="QTreeView" name="watchView">
         <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
+         <set>QAbstractItemView::DoubleClicked</set>
         </property>
         <property name="selectionMode">
          <enum>QAbstractItemView::NoSelection</enum>
@@ -3368,6 +3369,11 @@
   <action name="actionNew_NASM_File">
    <property name="text">
     <string>New NASM File</string>
+   </property>
+  </action>
+  <action name="actionReparse_Code">
+   <property name="text">
+    <string>Reparse Code</string>
    </property>
   </action>
  </widget>

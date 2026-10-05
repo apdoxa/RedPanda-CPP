@@ -40,6 +40,9 @@ private slots:
     void test_match_brackets_data();
     void test_match_brackets();
 
+    void test_get_block_start_end_data();
+    void test_get_block_start_end();
+
     void test_select_data();
     void test_select();
 
@@ -132,6 +135,12 @@ private slots:
     void test_setseltext_and_indent();
     void test_setseltext_and_indent2();
     void test_setseltext_and_indent3_line_comment();
+
+    void test_auto_indent_for_parenthesis();
+    void test_auto_indent_for_brace_after_closing_parenthesis();
+    void test_auto_indent_for_if_else();
+    void test_auto_indent_for_if_else_2();
+    void test_auto_indent_for_if_else_3();
 };
 
 }

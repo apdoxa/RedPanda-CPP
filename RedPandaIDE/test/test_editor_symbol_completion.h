@@ -65,6 +65,9 @@ private slots:
     void test_input_periods1();
     void test_input_periods_in_comments();
     void test_input_periods_in_string();
+
+    void test_input_docstring();
+    void test_input_after_cpp_comment();
 };
 
 #endif

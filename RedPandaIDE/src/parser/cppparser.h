@@ -47,6 +47,7 @@ public:
 
     ~CppParser();
 
+    void setFileOnlyIncludeOnce(bool includeOnce);
     void addHardDefineByLine(const QString& line);
     void addProjectFile(const QString &fileName, bool needScan);
     void addIncludePath(const QString& value);
@@ -156,8 +157,11 @@ public:
 
     QList<QString> namespaces();
 
-    static bool isIdentifier(const QString& token){
-        return (!token.isEmpty() && isIdentifierChar(token.front()));
+    static bool isIdentifier(const QString& token) {
+        return (!token.isEmpty() &&
+                ( (token.startsWith("::") && token.length()>2)
+                    || isIdentifierStartChar(token.front())
+                  ));
         // return (!token.isEmpty() && isIdentChar(token.front())
         //         && !token.contains("\""));
     }
@@ -450,11 +454,8 @@ private:
         switch(term[0].unicode()) {
         case '*':
             return true;
-        case '\"':
-        case '\'':
-            return false;
         default:
-            return isIdentifierChar(term[0]);
+            return isIdentifier(term);
         }
     }
 
@@ -560,7 +561,7 @@ private:
     void handleAccessibilitySpecifiers(KeywordType keywordType, int maxIndex);
     bool handleStatement(int maxIndex);
     void handleStructs(bool isTypedef, int maxIndex);
-    void handleStructredBinding(const QString& sType, int maxIndex);
+    void handleStructuredBinding(const QString& sType, int maxIndex);
     void handleUsing(int maxIndex);
     void handleVar(const QString& typePrefix,bool isExtern,bool isStatic, int maxIndex);
     void handleInheritance(PStatement derivedClass, PClassInheritanceInfo pInfo);
@@ -592,15 +593,20 @@ private:
     bool splitLastMember(const QString& token, QString& lastMember, QString& remaining);
 
 
-    static constexpr  bool isIdentifierOrPointerOrReferenceStart(const QChar& ch){
-        return ch.isLetter()
-                || ch == '_'
-                || ch == '*'
-                || ch == '&';
+    static bool isIdentifierOrPointerOrReference(const QString& s){
+        return isIdentifier(s)
+                || s[0] == '*'
+                || s[0] == '&';
     }    
+
+    static constexpr  bool isIdentifierStartChar(const QChar& ch){
+        return ch.isLetter()
+                || ch == '_';
+    }
 
     static constexpr  bool isIdentifierChar(const QChar& ch){
         return ch.isLetter()
+                || (ch>='0' && ch<='9')
                 || ch == '_';
     }
 
@@ -756,7 +762,7 @@ private:
     QHash<QString,PStatementList> mNamespaces;  // namespace and the statements in its scope
     QList<PClassInheritanceInfo> mClassInheritances;
     QSet<QString> mInlineNamespaces;
-    bool mStopParse;
+    bool mStopForReset;
 #ifdef QT_DEBUG
     int mLastIndex;
 #endif
